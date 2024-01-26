@@ -2,7 +2,7 @@ pub mod records;
 use records::Record;
 
 #[cfg(feature = "parallel")]
-pub fn pdbreader(contents: &String) -> Vec<Record> {
+pub fn pdbreader(contents: &str) -> Vec<Record> {
     use rayon::prelude::*;
 
     let lines: Vec<&str> = contents.lines().collect();
@@ -34,7 +34,7 @@ pub fn pdbreader(contents: &String) -> Vec<Record> {
     record
 }
 
-pub fn pdbreader_single(contents: &String) -> Vec<Record> {
+pub fn pdbreader_single(contents: &str) -> Vec<Record> {
     let mut last = 0;
     contents
         .lines()

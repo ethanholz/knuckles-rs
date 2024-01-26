@@ -17,7 +17,6 @@ impl SeqresRecord {
             chain_id: str.chars().nth(11).unwrap(),
             num_res: str[13..17].trim().parse().unwrap(),
             res_names: str[19..]
-                .trim()
                 .split_whitespace()
                 .map(|s| s.to_string())
                 .collect(),

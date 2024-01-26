@@ -44,7 +44,7 @@ impl AtomRecord {
             element: str
                 .get(77..80)
                 .map(|str| str.trim().to_string())
-                .filter(|item| item != ""),
+                .filter(|item| !item.is_empty()),
             charge: str
                 .get(78..80)
                 .map(|str| str.trim().to_string())

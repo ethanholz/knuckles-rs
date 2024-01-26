@@ -91,7 +91,7 @@ mod tests {
         assert_eq!(record.serial_number, 1);
         assert_eq!(record.matrix, [-1., 0., 0.]);
         assert_eq!(record.vn, 0.);
-        assert_eq!(record.i_given, true);
+        assert!(record.i_given);
         let line2 = "MTRIX2   1  0.000000  1.000000  0.000000        0.00000    1";
         let record = MtrixnRecord::from(line2);
 
@@ -99,7 +99,7 @@ mod tests {
         assert_eq!(record.serial_number, 1);
         assert_eq!(record.matrix, [0., 1., 0.]);
         assert_eq!(record.vn, 0.);
-        assert_eq!(record.i_given, true);
+        assert!(record.i_given);
     }
 
     #[test]
@@ -112,9 +112,9 @@ mod tests {
                 assert_eq!(record.serial_number, 1);
                 assert_eq!(record.matrix, [-1., 0., 0.]);
                 assert_eq!(record.vn, 0.);
-                assert_eq!(record.i_given, true);
+                assert!(record.i_given);
             }
-            _ => assert!(false),
+            _ => unreachable!(),
         }
     }
 

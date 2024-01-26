@@ -35,10 +35,11 @@ fn main() {
     // println!("{:?}", out[0]);
     out.iter()
         // .filter(|&record| matches!(record, records::Record::DBRef(_)))
-        .filter(|&record| match record {
-            records::Record::DBRef(_) => true,
-            records::Record::Seqres(_) => true,
-            _ => false,
+        .filter(|&record| {
+            matches!(
+                record,
+                records::Record::Seqres(_) | records::Record::DBRef(_)
+            )
         })
         // .skip(99996)
         // .take(10)
