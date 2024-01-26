@@ -93,7 +93,7 @@ rust-overlay = {
     };
 
   nixConfig = {
-    extra-substituters = [ "https://knuckles.cachix.org" ];
+    extra-substituters = [ "https://knuckles-rs.cachix.org" ];
     extra-trusted-public-keys = [ "knuckles-rs.cachix.org-1:eBlz21yOSDiD+CeBoGKbDE27FWtFNgIs1W84fQ8JpTQ=" ];
   };
 
