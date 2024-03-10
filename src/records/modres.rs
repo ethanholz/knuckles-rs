@@ -7,7 +7,7 @@ pub struct ModresRecord {
     pub id_code: String,
     pub res_name: String,
     pub chain_id: char,
-    pub seq_num: u32,
+    pub seq_num: i32,
     pub i_code: Option<char>,
     pub std_res_name: String,
     pub comment: String,
