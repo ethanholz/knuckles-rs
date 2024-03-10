@@ -7,7 +7,7 @@ pub struct TermRecord {
     pub serial: u32,
     pub res_name: String,
     pub chain_id: char,
-    pub res_seq: u32,
+    pub res_seq: i16,
     pub i_code: Option<char>,
 }
 
