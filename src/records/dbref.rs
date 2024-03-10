@@ -30,9 +30,10 @@ pub enum DBType {
 
 impl DBType {
     pub fn new(str: &str) -> Self {
+        println!("DBTYPE STR: {}", str.trim());
         match str.trim() {
             "GB" => DBType::GB,
-            "NORINE" => DBType::NORINE,
+            "NORINE" | "NOR" => DBType::NORINE,
             "PDB" => DBType::PDB,
             "UNP" => DBType::UNP,
             _ => panic!("Unknown DBType"),

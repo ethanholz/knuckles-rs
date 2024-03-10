@@ -8,6 +8,7 @@ pub mod modres;
 pub mod mtrixn;
 pub mod origxn;
 pub mod scalen;
+pub mod seqadv;
 pub mod seqres;
 pub mod term;
 
@@ -29,6 +30,7 @@ pub enum Record {
     OrigxN(origxn::OrigxN),
     ScaleN(scalen::ScaleN),
     Seqres(seqres::SeqresRecord),
+    Seqadv(seqadv::SeqAdvRecord),
     Term(term::TermRecord),
     Endmdl(),
 }
@@ -82,6 +84,7 @@ impl std::fmt::Display for Record {
             Record::OrigxN(origxn) => write!(f, "{:?}", origxn),
             Record::ScaleN(scalen) => write!(f, "{:?}", scalen),
             Record::Seqres(seqres) => write!(f, "{:?}", seqres),
+            Record::Seqadv(seqadv) => write!(f, "{:?}", seqadv),
             Record::Term(term) => write!(f, "{:?}", term),
         }
     }
