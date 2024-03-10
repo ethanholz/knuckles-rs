@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 pub struct SeqresRecord {
     pub ser_num: u32,
     pub chain_id: char,
-    pub num_res: u32,
+    pub num_res: i16,
     pub res_names: Vec<String>,
 }
 
