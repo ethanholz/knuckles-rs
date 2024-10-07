@@ -4,12 +4,12 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-knuckles-parse = {path = "../knuckles-parse"}
+knuckles-parse = {path = "../knuckles-parse", default-features = false}
 rayon = { workspace = true, optional = true }
-serde = { workspace = true, features = ["serde_derive"] }
+serde = { workspace = true, features = ["serde_derive"], optional = true }
 serde_json = { workspace = true, optional = true }
 
 [features]
 default = ["parallel", "serde"]
-serde = ["dep:serde_json"]
+serde = ["dep:serde_json", "dep:serde"]
 parallel = ["dep:rayon"]

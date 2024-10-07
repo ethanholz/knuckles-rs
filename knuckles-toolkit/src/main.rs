@@ -36,8 +36,7 @@ fn main() {
     out.iter()
         // .filter(|&record| matches!(record, records::Record::DBRef(_)))
         .filter(|&record| matches!(record, records::Record::Atom(_)))
-        // .skip(99996)
-        // .take(10)
+        .take(10)
         .for_each(|record| {
             println!("{}", record);
             // if let records::Record::Atom(atom) = record {
