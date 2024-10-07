@@ -22,7 +22,7 @@ rust-overlay = {
 
   outputs = inputs@{ self, flake-parts, nixpkgs, crane, flake-utils, rust-overlay, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
-      systems = [ "x86_64-linux" ];
+      systems = [ "x86_64-linux" "aarch64-linux" "aarch64-darwin" "x86_64-darwin" ];
       perSystem = { pkgs, system, ... }:
         let
           pkgs = import nixpkgs {

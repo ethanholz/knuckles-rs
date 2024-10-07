@@ -1,10 +1,10 @@
-use knuckles::records;
+use knuckles_parse::records;
 
 #[cfg(not(feature = "parallel"))]
-use knuckles::pdbreader_single;
+use knuckles_parse::pdbreader_single;
 
 #[cfg(feature = "parallel")]
-use knuckles::pdbreader;
+use knuckles_parse::pdbreader;
 
 fn main() {
     let contents =
@@ -35,12 +35,7 @@ fn main() {
     // println!("{:?}", out[0]);
     out.iter()
         // .filter(|&record| matches!(record, records::Record::DBRef(_)))
-        .filter(|&record| {
-            matches!(
-                record,
-                records::Record::Seqres(_) | records::Record::DBRef(_)
-            )
-        })
+        .filter(|&record| matches!(record, records::Record::Atom(_)))
         // .skip(99996)
         // .take(10)
         .for_each(|record| {

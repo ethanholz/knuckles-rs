@@ -1,0 +1,16 @@
+[package]
+name = "knuckles-parse"
+version = "0.1.0"
+edition = "2021"
+
+
+[dependencies]
+rayon = { workspace = true, optional = true }
+serde = { workspace = true, features = ["serde_derive"] }
+serde_json = { workspace = true, optional = true }
+
+[features]
+default = ["parallel"]
+parallel = ["dep:rayon"]
+serde = ["dep:serde_json"]
+
