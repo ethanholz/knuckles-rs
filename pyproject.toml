@@ -19,5 +19,12 @@ features = ["python"]
 [tool.ruff.lint]
 select = ["F", "E", "N", "D"]
 
+[tool.pyright]
+venvPath =  "."
+venv = ".venv"
+mode = "strict"
+
 [dependency-groups]
-dev = []
+dev = [
+    "ruff>=0.7.3",
+]
