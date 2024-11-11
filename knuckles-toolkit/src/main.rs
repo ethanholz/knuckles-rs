@@ -4,13 +4,13 @@ use knuckles_parse::records;
 use knuckles_parse::pdbreader_single;
 
 #[cfg(feature = "parallel")]
-use knuckles_parse::pdbreader;
+use knuckles_parse::pdbreader_parallel as pdbreader;
 
 fn main() {
     let contents =
         std::fs::read_to_string("tests/4pth.pdb").expect("Something went wrong reading the file");
     let mut times = Vec::new();
-    for _ in 0..50 {
+    for i in 0..50 {
         let start = std::time::Instant::now();
         #[cfg(feature = "parallel")]
         let _ = pdbreader(&contents);
@@ -21,6 +21,7 @@ fn main() {
         // let _ = pdbreader("tests/4pth.pdb");
         let end = std::time::Instant::now();
         times.push(end - start);
+        println!("Run {}: Time: {:?}", i, end - start);
     }
     let sum: std::time::Duration = times.iter().sum();
     let avg = sum / times.len() as u32;
