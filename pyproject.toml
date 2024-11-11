@@ -1,0 +1,23 @@
+[build-system]
+requires = ["maturin>=1,<2"]
+build-backend = "maturin"
+
+[project]
+name = "knuckles_parse"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Rust",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+]
+dependencies = []
+
+[tool.maturin]
+manifest-path = "knuckles-parse/Cargo.toml"
+features = ["python"]
+
+[tool.ruff.lint]
+select = ["F", "E", "N", "D"]
+
+[dependency-groups]
+dev = []
