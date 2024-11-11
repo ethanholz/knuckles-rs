@@ -1,8 +1,16 @@
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
+#[cfg(feature = "python")]
+use pyo3::prelude::*;
+
+#[cfg(feature = "python")]
+use knuckles_macro::pydefault;
+
+#[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "python", pyclass)]
+#[cfg_attr(feature = "python", pydefault)]
 pub enum MtrixN {
     Mtrix1(MtrixnRecord),
     Mtrix2(MtrixnRecord),
@@ -27,8 +35,10 @@ impl From<&str> for MtrixN {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "python", pyclass(get_all, set_all))]
+#[cfg_attr(feature = "python", pydefault)]
 pub struct MtrixnRecord {
     pub n: u32,
     pub serial_number: u32,
@@ -38,6 +48,10 @@ pub struct MtrixnRecord {
 }
 
 impl MtrixnRecord {
+    pub fn new(str: &str) -> Self {
+        Self::from(str)
+    }
+
     pub fn from(str: &str) -> Self {
         Self {
             n: str.chars().nth(5).unwrap() as u32 - 48,

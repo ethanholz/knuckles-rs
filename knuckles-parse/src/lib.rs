@@ -1,8 +1,11 @@
 pub mod records;
 use records::Record;
 
+#[cfg(feature = "python")]
+use pyo3::prelude::*;
+
 #[cfg(feature = "parallel")]
-pub fn pdbreader(contents: &str) -> Vec<Record> {
+pub fn pdbreader_parallel(contents: &str) -> Vec<Record> {
     use rayon::prelude::*;
 
     let lines: Vec<&str> = contents.lines().collect();
@@ -57,4 +60,55 @@ pub fn pdbreader_single(contents: &str) -> Vec<Record> {
             // Record::try_from(line).ok()
         })
         .collect()
+}
+
+#[cfg(feature = "python")]
+#[pymodule(name = "knuckles_parse")]
+mod knuckles_parse {
+    use super::*;
+    #[pymodule_export]
+    use crate::records::anisotropic::AnisotropicRecord;
+    #[pymodule_export]
+    use crate::records::atom::AtomRecord;
+    #[pymodule_export]
+    use crate::records::connect::ConnectRecord;
+    #[pymodule_export]
+    use crate::records::crystal::CrystalRecord;
+    #[pymodule_export]
+    use crate::records::dbref::DBRefRecord;
+    #[pymodule_export]
+    use crate::records::het::HetRecord;
+    #[pymodule_export]
+    use crate::records::hetnam::HetnamRecord;
+    #[pymodule_export]
+    use crate::records::model::ModelRecord;
+    #[pymodule_export]
+    use crate::records::modres::ModresRecord;
+    #[pymodule_export]
+    use crate::records::mtrixn::MtrixnRecord;
+    #[pymodule_export]
+    use crate::records::nummdl::NummdlRecord;
+    #[pymodule_export]
+    use crate::records::origxn::OrigxnRecord;
+    #[pymodule_export]
+    use crate::records::scalen::ScalenRecord;
+    #[pymodule_export]
+    use crate::records::seqadv::SeqAdvRecord;
+    #[pymodule_export]
+    use crate::records::seqres::SeqresRecord;
+    #[pymodule_export]
+    use crate::records::term::TermRecord;
+    #[pymodule_export]
+    use crate::records::Record;
+
+    /// Creates a list of PDB records from a string
+    #[pyfunction]
+    fn pdbreader(contents: &str) -> Vec<Record> {
+        pdbreader_parallel(contents)
+    }
+
+    #[pyfunction]
+    fn version() -> String {
+        env!("CARGO_PKG_VERSION").to_string()
+    }
 }

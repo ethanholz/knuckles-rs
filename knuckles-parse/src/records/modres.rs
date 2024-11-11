@@ -1,8 +1,16 @@
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
+#[cfg(feature = "python")]
+use pyo3::prelude::*;
+
+#[cfg(feature = "python")]
+use knuckles_macro::pydefault;
+
+#[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "python", pyclass(get_all, set_all))]
+#[cfg_attr(feature = "python", pydefault)]
 pub struct ModresRecord {
     pub id_code: String,
     pub res_name: String,
@@ -14,6 +22,10 @@ pub struct ModresRecord {
 }
 
 impl ModresRecord {
+    pub fn new(str: &str) -> ModresRecord {
+        ModresRecord::from(str)
+    }
+
     pub fn from(line: &str) -> Self {
         Self {
             id_code: line[7..11].trim().to_string(),

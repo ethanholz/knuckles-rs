@@ -19,7 +19,6 @@ knuckles-macro = { path = "../knuckles-macro", optional = true}
 rayon = { workspace = true, optional = true }
 serde = { workspace = true, features = ["serde_derive"], optional = true }
 serde_json = { workspace = true, optional = true }
-anyhow = "1.0.91"
 
 [features]
 default = ["parallel"]

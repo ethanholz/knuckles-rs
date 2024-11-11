@@ -1,8 +1,16 @@
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
+#[cfg(feature = "python")]
+use pyo3::prelude::*;
+
+#[cfg(feature = "python")]
+use knuckles_macro::pydefault;
+
+#[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "python", pyclass)]
+#[cfg_attr(feature = "python", pydefault)]
 pub enum ScaleN {
     Scale1(ScalenRecord),
     Scale2(ScalenRecord),
@@ -27,8 +35,10 @@ impl From<&str> for ScaleN {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "python", pyclass(get_all, set_all))]
+#[cfg_attr(feature = "python", pydefault)]
 pub struct ScalenRecord {
     pub n: u16,
     pub scalen: [f32; 3],
