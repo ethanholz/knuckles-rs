@@ -2,3 +2,7 @@
 result/
 tests/
 result
+.DS_STORE
+mutants*
+lcov.info
+.intentionally-empty-file.o
