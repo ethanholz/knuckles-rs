@@ -1,6 +1,9 @@
 [package]
 name = "knuckles-macro"
-version = "0.1.0"
+version.workspace = true
+authors.workspace = true
+license.workspace = true
+license-file.workspace = true
 edition = "2021"
 
 [dependencies]

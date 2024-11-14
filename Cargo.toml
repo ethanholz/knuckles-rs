@@ -2,6 +2,14 @@
 members = [ "knuckles-macro","knuckles-parse", "knuckles-toolkit"]
 resolver = "2"
 
+[workspace.package]
+version = "0.2.0"
+description = "A tooklkit for parsing PDB records"
+authors = ["Ethan Holz"]
+license = "MIT"
+license-file = "LICENSE"
+
+
 [workspace.dependencies]
 rayon = { version = "1.8.1"}
 serde = { version = "1.0.195", features = ["derive"]}

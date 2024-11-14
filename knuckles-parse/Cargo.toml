@@ -1,6 +1,9 @@
 [package]
 name = "knuckles-parse"
-version = "0.2.0"
+version.workspace = true
+authors.workspace = true
+license.workspace = true
+license-file.workspace = true
 edition = "2021"
 
 [lib]
