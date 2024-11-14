@@ -1,8 +1,20 @@
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
+#[cfg(feature = "python")]
+use knuckles_macro::pydefault;
+
+#[cfg(feature = "python")]
+use pyo3::prelude::*;
+
+#[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(
+    feature = "python",
+    pyclass(get_all, set_all, module = "kncukles_parse")
+)]
+#[cfg_attr(feature = "python", pydefault)]
+/// A record for an atom in a PDB file
 pub struct AtomRecord {
     pub serial: u32,
     pub name: String,
@@ -23,9 +35,14 @@ pub struct AtomRecord {
 
 impl AtomRecord {
     pub fn new(str: &str) -> AtomRecord {
+        let mut radix = 10;
+        let serial = str[6..11].trim();
+        if serial.chars().any(|c| c.is_ascii_alphabetic()) {
+            radix = 16;
+        }
         AtomRecord {
             // TODO: add support for parsing serial numbers > 99999
-            serial: str[6..11].trim().parse::<u32>().unwrap_or_default(),
+            serial: u32::from_str_radix(serial, radix).unwrap_or_default(),
             name: str[12..16].trim().to_string(),
             alt_loc: str[16..17].trim().parse::<char>().ok(),
             res_name: str[17..20].trim().to_string(),
@@ -80,6 +97,26 @@ mod tests {
         assert_eq!(record.temp_factor, 19.49);
         assert_eq!(record.entry, Some("1UBQ".to_string()));
         assert_eq!(record.element, None);
+        assert_eq!(record.charge, None);
+    }
+
+    #[test]
+    fn parse_atom_line_hex_test() {
+        const LINE: &str =
+            "ATOM  186a0  CA  GLY A  67      26.731  62.085   4.078  0.00  7.83           C  ";
+        let record = AtomRecord::new(LINE);
+        assert_eq!(record.serial, 100000);
+        assert_eq!(record.name, "CA");
+        assert_eq!(record.alt_loc, None);
+        assert_eq!(record.res_name, "GLY");
+        assert_eq!(record.res_seq, 67);
+        assert_eq!(record.x, 26.731);
+        assert_eq!(record.y, 62.085);
+        assert_eq!(record.z, 4.078);
+        assert_eq!(record.occupancy, 0.00);
+        assert_eq!(record.temp_factor, 7.83);
+        assert_eq!(record.entry, None);
+        assert_eq!(record.element, Some("C".to_string()));
         assert_eq!(record.charge, None);
     }
 }

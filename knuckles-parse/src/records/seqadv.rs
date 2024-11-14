@@ -3,8 +3,16 @@ use serde::{Deserialize, Serialize};
 
 use super::dbref::DBType;
 
-#[derive(Debug)]
+#[cfg(feature = "python")]
+use knuckles_macro::pydefault;
+
+#[cfg(feature = "python")]
+use pyo3::prelude::*;
+
+#[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "python", pyclass(get_all, set_all))]
+#[cfg_attr(feature = "python", pydefault)]
 pub struct SeqAdvRecord {
     pub id_code: String,
     pub res_name: String,

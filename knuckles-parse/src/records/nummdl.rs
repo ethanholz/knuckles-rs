@@ -11,27 +11,27 @@ use knuckles_macro::pydefault;
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "python", pyclass(get_all, set_all))]
 #[cfg_attr(feature = "python", pydefault)]
-pub struct ModelRecord {
-    pub serial: u32,
+pub struct NummdlRecord {
+    pub count: u32,
 }
 
-impl ModelRecord {
-    pub fn new(str: &str) -> ModelRecord {
-        ModelRecord {
-            serial: str[10..14].trim().parse::<u32>().unwrap_or_default(),
+impl NummdlRecord {
+    pub fn new(str: &str) -> NummdlRecord {
+        NummdlRecord {
+            count: str[10..14].trim().parse::<u32>().unwrap_or_default(),
         }
     }
 }
 
-impl From<&str> for ModelRecord {
+impl From<&str> for NummdlRecord {
     fn from(str: &str) -> Self {
-        ModelRecord::new(str)
+        NummdlRecord::new(str)
     }
 }
 
-impl std::fmt::Display for ModelRecord {
+impl std::fmt::Display for NummdlRecord {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:<1$}", format!("MODEL     {:>4}", self.serial), 80)
+        write!(f, "{:<1$}", format!("NUMMDL    {:>4}", self.count), 80)
     }
 }
 
@@ -40,21 +40,21 @@ mod tests {
     use super::*;
     #[test]
     fn test_model_record_new() {
-        let line = "MODEL        1";
-        let model = ModelRecord::new(line);
-        assert_eq!(model.serial, 1);
+        let line = "NUMMDL       1";
+        let model = NummdlRecord::new(line);
+        assert_eq!(model.count, 1);
     }
     #[test]
     fn test_model_record_from() {
-        let line = "MODEL        1";
-        let model = ModelRecord::from(line);
-        assert_eq!(model.serial, 1);
+        let line = "NUMMDL       1";
+        let model = NummdlRecord::from(line);
+        assert_eq!(model.count, 1);
     }
     #[test]
     fn test_model_record_display() {
-        let model = ModelRecord { serial: 1 };
+        let model = NummdlRecord { count: 1 };
         let result =
-            "MODEL        1                                                                  ";
+            "NUMMDL       1                                                                  ";
         assert_eq!(format!("{}", model), result);
     }
 }

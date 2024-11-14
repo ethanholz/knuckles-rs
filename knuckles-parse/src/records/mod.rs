@@ -3,9 +3,12 @@ pub mod atom;
 pub mod connect;
 pub mod crystal;
 pub mod dbref;
+pub mod het;
+pub mod hetnam;
 pub mod model;
 pub mod modres;
 pub mod mtrixn;
+pub mod nummdl;
 pub mod origxn;
 pub mod scalen;
 pub mod seqadv;
@@ -15,15 +18,22 @@ pub mod term;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
+#[cfg(feature = "python")]
+use pyo3::prelude::*;
+
 #[derive(Debug)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "python", pyclass)]
 pub enum Record {
     Anisou(anisotropic::AnisotropicRecord),
     Atom(atom::AtomRecord),
     Connect(connect::ConnectRecord),
     Crystal(crystal::CrystalRecord),
     DBRef(dbref::DBRefRecord),
+    Het(het::HetRecord),
     Hetatm(atom::AtomRecord),
+    Hetnam(hetnam::HetnamRecord),
+    Nummdl(nummdl::NummdlRecord),
     MtrixN(mtrixn::MtrixN),
     Model(model::ModelRecord),
     Modres(modres::ModresRecord),
@@ -33,6 +43,76 @@ pub enum Record {
     Seqadv(seqadv::SeqAdvRecord),
     Term(term::TermRecord),
     Endmdl(),
+}
+#[cfg(feature = "python")]
+macro_rules! debug_match {
+    ($self:expr, { $($variant:ident($value:ident)),* }) => {
+        match $self {
+            $(Self::$variant($value) => format!("{:?}", $value),)*
+            Self::Endmdl() => "ENDMDL".to_string(),
+        }
+    };
+}
+
+#[cfg(feature = "python")]
+#[pymethods]
+impl Record {
+    #[new]
+    fn python_new(str: &str) -> Self {
+        match Self::try_from(str) {
+            Ok(item) => item,
+            Err(_) => panic!("Unable to parse line"),
+        }
+    }
+    #[getter]
+    fn record(&self, py: Python<'_>) -> PyObject {
+        match self {
+            Self::Anisou(anisou) => anisou.clone().into_py(py),
+            Self::Atom(atom) => atom.clone().into_py(py),
+            Self::Connect(connect) => connect.clone().into_py(py),
+            Self::Crystal(crystal) => crystal.clone().into_py(py),
+            Self::DBRef(dbref) => dbref.clone().into_py(py),
+            Self::Endmdl() => py.None(),
+            Self::Hetatm(atom) => atom.clone().into_py(py),
+            Self::Het(het) => het.clone().into_py(py),
+            Self::Hetnam(hetnam) => hetnam.clone().into_py(py),
+            Self::Nummdl(nummdl) => nummdl.clone().into_py(py),
+            Self::Model(model) => model.clone().into_py(py),
+            Self::Modres(modres) => modres.clone().into_py(py),
+            Self::MtrixN(mtrix) => mtrix.clone().into_py(py),
+            Self::OrigxN(origxn) => origxn.clone().into_py(py),
+            Self::ScaleN(scalen) => scalen.clone().into_py(py),
+            Self::Seqadv(seqadv) => seqadv.clone().into_py(py),
+            Self::Seqres(seqres) => seqres.clone().into_py(py),
+            Self::Term(term) => term.clone().into_py(py),
+        }
+    }
+
+    fn __repr__(&self) -> String {
+        debug_match!(
+            self,
+            {
+                Anisou(anisou),
+                Atom(atom),
+                Connect(connect),
+                Crystal(crystal),
+                DBRef(dbref),
+                Het(het),
+                Hetatm(atom),
+                Hetnam(hetnam),
+                Model(model),
+                Modres(modres),
+                MtrixN(mtrix),
+                Nummdl(nummdl),
+                OrigxN(origxn),
+                ScaleN(scalen),
+                Seqadv(seqadv),
+                Seqres(seqres),
+                Term(term)
+            }
+
+        )
+    }
 }
 
 impl TryFrom<&str> for Record {
@@ -48,9 +128,12 @@ impl TryFrom<&str> for Record {
                 "DBREF " => Ok(Record::DBRef(dbref::DBRefRecord::from(line))),
                 "ENDMDL" => Ok(Record::Endmdl()),
                 "HETATM" => Ok(Record::Hetatm(atom::AtomRecord::from(line))),
+                "HET   " => Ok(Record::Het(het::HetRecord::from(line))),
+                "HETNAM" => Ok(Record::Hetnam(hetnam::HetnamRecord::from(line))),
                 "MTRIX1" | "MTRIX2" | "MTRIX3" => Ok(Record::MtrixN(mtrixn::MtrixN::from(line))),
                 "MODEL " => Ok(Record::Model(model::ModelRecord::from(line))),
                 "MODRES" => Ok(Record::Modres(modres::ModresRecord::from(line))),
+                "NUMMDL" => Ok(Record::Nummdl(nummdl::NummdlRecord::from(line))),
                 "ORIGX1" | "ORIGX2" | "ORIGX3" => Ok(Record::OrigxN(origxn::OrigxN::from(line))),
                 "SCALE1" | "SCALE2" | "SCALE3" => Ok(Record::ScaleN(scalen::ScaleN::from(line))),
                 "SEQRES" => Ok(Record::Seqres(seqres::SeqresRecord::from(line))),
@@ -78,9 +161,12 @@ impl std::fmt::Display for Record {
             Record::DBRef(dbref) => write!(f, "{:?}", dbref),
             Record::Endmdl() => write!(f, "ENDMDL"),
             Record::Hetatm(atom) => write!(f, "{:?}", atom),
+            Record::Hetnam(hetnam) => write!(f, "{:?}", hetnam),
+            Record::Het(het) => write!(f, "{:?}", het),
             Record::MtrixN(mtrix) => write!(f, "{:?}", mtrix),
             Record::Model(model) => write!(f, "{:?}", model),
             Record::Modres(modres) => write!(f, "{:?}", modres),
+            Record::Nummdl(nummdl) => write!(f, "{:?}", nummdl),
             Record::OrigxN(origxn) => write!(f, "{:?}", origxn),
             Record::ScaleN(scalen) => write!(f, "{:?}", scalen),
             Record::Seqres(seqres) => write!(f, "{:?}", seqres),
