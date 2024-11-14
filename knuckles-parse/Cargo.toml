@@ -5,6 +5,7 @@ authors.workspace = true
 license.workspace = true
 license-file.workspace = true
 readme.workspace = true
+description.workspace = true
 edition = "2021"
 
 [lib]
