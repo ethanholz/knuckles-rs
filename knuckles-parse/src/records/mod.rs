@@ -65,26 +65,26 @@ impl Record {
         }
     }
     #[getter]
-    fn record(&self, py: Python<'_>) -> PyObject {
+    fn record(&self, py: Python) -> Py<PyAny> {
         match self {
-            Self::Anisou(anisou) => anisou.clone().into_py(py),
-            Self::Atom(atom) => atom.clone().into_py(py),
-            Self::Connect(connect) => connect.clone().into_py(py),
-            Self::Crystal(crystal) => crystal.clone().into_py(py),
-            Self::DBRef(dbref) => dbref.clone().into_py(py),
+            Self::Atom(atom) => atom.clone().into_pyobject(py).unwrap().into_any().into(),
+            Self::Anisou(anisou) => anisou.clone().into_pyobject(py).unwrap().into_any().into(),
+            Self::Connect(connect) => connect.clone().into_pyobject(py).unwrap().into_any().into(),
+            Self::Crystal(crystal) => crystal.clone().into_pyobject(py).unwrap().into_any().into(),
+            Self::DBRef(dbref) => dbref.clone().into_pyobject(py).unwrap().into_any().into(),
             Self::Endmdl() => py.None(),
-            Self::Hetatm(atom) => atom.clone().into_py(py),
-            Self::Het(het) => het.clone().into_py(py),
-            Self::Hetnam(hetnam) => hetnam.clone().into_py(py),
-            Self::Nummdl(nummdl) => nummdl.clone().into_py(py),
-            Self::Model(model) => model.clone().into_py(py),
-            Self::Modres(modres) => modres.clone().into_py(py),
-            Self::MtrixN(mtrix) => mtrix.clone().into_py(py),
-            Self::OrigxN(origxn) => origxn.clone().into_py(py),
-            Self::ScaleN(scalen) => scalen.clone().into_py(py),
-            Self::Seqadv(seqadv) => seqadv.clone().into_py(py),
-            Self::Seqres(seqres) => seqres.clone().into_py(py),
-            Self::Term(term) => term.clone().into_py(py),
+            Self::Hetatm(atom) => atom.clone().into_pyobject(py).unwrap().into_any().into(),
+            Self::Het(het) => het.clone().into_pyobject(py).unwrap().into_any().into(),
+            Self::Hetnam(hetnam) => hetnam.clone().into_pyobject(py).unwrap().into_any().into(),
+            Self::Nummdl(nummdl) => nummdl.clone().into_pyobject(py).unwrap().into_any().into(),
+            Self::Model(model) => model.clone().into_pyobject(py).unwrap().into_any().into(),
+            Self::Modres(modres) => modres.clone().into_pyobject(py).unwrap().into_any().into(),
+            Self::MtrixN(mtrix) => mtrix.clone().into_pyobject(py).unwrap().into_any().into(),
+            Self::OrigxN(origxn) => origxn.clone().into_pyobject(py).unwrap().into_any().into(),
+            Self::ScaleN(scalen) => scalen.clone().into_pyobject(py).unwrap().into_any().into(),
+            Self::Seqadv(seqadv) => seqadv.clone().into_pyobject(py).unwrap().into_any().into(),
+            Self::Seqres(seqres) => seqres.clone().into_pyobject(py).unwrap().into_any().into(),
+            Self::Term(term) => term.clone().into_pyobject(py).unwrap().into_any().into(),
         }
     }
 
