@@ -57,4 +57,14 @@ mod tests {
             "NUMMDL       1                                                                  ";
         assert_eq!(format!("{}", model), result);
     }
+
+    #[test]
+    #[cfg(feature = "serde")]
+    fn test_serde_serialization() {
+        let line = "NUMMDL       1";
+        let model = NummdlRecord::new(line);
+        let serialized = serde_json::to_string(&model).unwrap();
+        let deserialized: NummdlRecord = serde_json::from_str(&serialized).unwrap();
+        assert_eq!(model, deserialized);
+    }
 }
