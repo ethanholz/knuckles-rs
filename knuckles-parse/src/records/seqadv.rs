@@ -99,4 +99,59 @@ mod tests {
         assert_eq!(Some(14), record.db_seq);
         assert_eq!("SEE REMARK 999", record.conflict);
     }
+
+    #[test]
+    fn test_parse_line_from_seqdv_record() {
+        let line = "SEQADV 3ABC MET A   -1  UNP  P10725              EXPRESSION TAG";
+        let record = SeqAdvRecord::from(line);
+        assert_eq!("3ABC", record.id_code);
+        assert_eq!("MET", record.res_name);
+        assert_eq!('A', record.chain_id);
+        assert_eq!(-1, record.seq_num);
+        assert_eq!(None, record.i_code);
+        assert_eq!(DBType::UNP, record.database);
+        assert_eq!("P10725", record.db_accession);
+        assert_eq!(None, record.db_res);
+        assert_eq!(None, record.db_seq);
+        assert_eq!("EXPRESSION TAG", record.conflict);
+        let line = "SEQADV 3ABC GLY A   50  UNP  P10725    VAL    50 ENGINEERED";
+        let record = SeqAdvRecord::from(line);
+        assert_eq!("3ABC", record.id_code);
+        assert_eq!("GLY", record.res_name);
+        assert_eq!('A', record.chain_id);
+        assert_eq!(50, record.seq_num);
+        assert_eq!(None, record.i_code);
+        assert_eq!(DBType::UNP, record.database);
+        assert_eq!("P10725", record.db_accession);
+        assert_eq!(Some("VAL".to_string()), record.db_res);
+        assert_eq!(Some(50), record.db_seq);
+        assert_eq!("ENGINEERED", record.conflict);
+        let line = "SEQADV 2OKW LEU A   64  NOR  NOR00669  PHE    14 SEE REMARK 999";
+        let record = SeqAdvRecord::from(line);
+        assert_eq!("2OKW", record.id_code);
+        assert_eq!("LEU", record.res_name);
+        assert_eq!('A', record.chain_id);
+        assert_eq!(64, record.seq_num);
+        assert_eq!(None, record.i_code);
+        assert_eq!(DBType::NORINE, record.database);
+        assert_eq!("NOR00669", record.db_accession);
+        assert_eq!(Some("PHE".to_string()), record.db_res);
+        assert_eq!(Some(14), record.db_seq);
+        assert_eq!("SEE REMARK 999", record.conflict);
+    }
+
+    #[test]
+    #[cfg(feature = "serde")]
+    fn test_serde_serialization() {
+        let line = "SEQADV 3ABC MET A   -1  UNP  P10725              EXPRESSION TAG";
+        let record = SeqAdvRecord::from(line);
+        let serialized = serde_json::to_string(&record).expect("Serialization failed");
+        assert_eq!(
+            serialized,
+            r#"{"id_code":"3ABC","res_name":"MET","chain_id":"A","seq_num":-1,"i_code":null,"database":"UNP","db_accession":"P10725","db_res":null,"db_seq":null,"conflict":"EXPRESSION TAG"}"#
+        );
+        let deserialized: SeqAdvRecord =
+            serde_json::from_str(&serialized).expect("Deserialization failed");
+        assert_eq!(record, deserialized);
+    }
 }
