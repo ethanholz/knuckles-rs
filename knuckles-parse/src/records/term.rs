@@ -7,7 +7,7 @@ use pyo3::prelude::*;
 #[cfg(feature = "python")]
 use knuckles_macro::pydefault;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "python", pyclass(get_all, set_all))]
 #[cfg_attr(feature = "python", pydefault)]
