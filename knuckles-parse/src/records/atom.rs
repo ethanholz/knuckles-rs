@@ -119,4 +119,40 @@ mod tests {
         assert_eq!(record.element, Some("C".to_string()));
         assert_eq!(record.charge, None);
     }
+
+    #[test]
+    fn parse_atom_from_str() {
+        const LINE: &str =
+            "ATOM  186a0  CA  GLY A  67      26.731  62.085   4.078  0.00  7.83           C  ";
+        let record = AtomRecord::from(LINE);
+        assert_eq!(record.serial, 100000);
+        assert_eq!(record.name, "CA");
+        assert_eq!(record.alt_loc, None);
+        assert_eq!(record.res_name, "GLY");
+        assert_eq!(record.res_seq, 67);
+        assert_eq!(record.x, 26.731);
+        assert_eq!(record.y, 62.085);
+        assert_eq!(record.z, 4.078);
+        assert_eq!(record.occupancy, 0.00);
+        assert_eq!(record.temp_factor, 7.83);
+        assert_eq!(record.entry, None);
+        assert_eq!(record.element, Some("C".to_string()));
+        assert_eq!(record.charge, None);
+    }
+
+    #[test]
+    #[cfg(feature = "serde")]
+    fn test_serde_serialization() {
+        const LINE: &str =
+            "ATOM  186a0  CA  GLY A  67      26.731  62.085   4.078  0.00  7.83           C  ";
+        let record = AtomRecord::from(LINE);
+        let serialized = serde_json::to_string(&record).expect("Serialization failed");
+        assert_eq!(
+            serialized,
+            r#"{"serial":100000,"name":"CA","alt_loc":null,"res_name":"GLY","chain_id":"A","res_seq":67,"i_code":null,"x":26.731,"y":62.085,"z":4.078,"occupancy":0.0,"temp_factor":7.83,"element":"C","charge":null,"entry":null}"#
+        );
+        let deserialized: AtomRecord =
+            serde_json::from_str(&serialized).expect("Deserialization failed");
+        assert_eq!(record, deserialized);
+    }
 }
