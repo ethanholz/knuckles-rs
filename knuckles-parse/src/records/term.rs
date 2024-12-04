@@ -67,4 +67,19 @@ mod tests {
         assert_eq!(record.res_seq, 18);
         assert_eq!(record.i_code, None);
     }
+
+    #[test]
+    #[cfg(feature = "serde")]
+    fn test_serde_serialization() {
+        let str =
+            "TER     297      ALA A  18                                                      ";
+        let record = TermRecord::new(str);
+        let json = serde_json::to_string(&record).unwrap();
+        assert_eq!(
+            json,
+            r#"{"serial":297,"res_name":"ALA","chain_id":"A","res_seq":18,"i_code":null}"#
+        );
+        let deserialized: TermRecord = serde_json::from_str(&json).unwrap();
+        assert_eq!(record, deserialized);
+    }
 }
