@@ -78,4 +78,18 @@ mod tests {
         assert_eq!(record.num_het_atoms, 25);
         assert_eq!(record.text, None);
     }
+
+    #[test]
+    #[cfg(feature = "serde")]
+    fn test_serde_serialization() {
+        let line = "HET    UDP  A1457      25                     ";
+        let record: HetRecord = HetRecord::new(line);
+        let serialized = serde_json::to_string(&record).expect("Serialization failed");
+        assert_eq!(
+            serialized,
+            r#"{"het_id":"UDP","chain_id":"A","seq_num":1457,"i_code":null,"num_het_atoms":25,"text":null}"#
+        );
+        let deserialized = serde_json::from_str(&serialized).expect("Deserialization failed");
+        assert_eq!(record, deserialized);
+    }
 }
