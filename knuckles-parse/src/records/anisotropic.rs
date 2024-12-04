@@ -100,4 +100,68 @@ mod tests {
         assert_eq!(record.u12, 178);
         assert_eq!(record.element, None);
     }
+
+    #[test]
+    fn from_anisout_line_test() {
+        const LINE: &str =
+            "ANISOU    1  N   MET A   1      688   1234    806    -19    -49    178       N  ";
+        let record = AnisotropicRecord::from(LINE);
+        assert_eq!(record.serial, 1);
+        assert_eq!(record.name, "N");
+        assert_eq!(record.res_name, "MET");
+        assert_eq!(record.chain_id, 'A');
+        assert_eq!(record.res_seq, 1);
+        assert_eq!(record.u00, 688);
+        assert_eq!(record.u11, 1234);
+        assert_eq!(record.u22, 806);
+        assert_eq!(record.u01, -19);
+        assert_eq!(record.u02, -49);
+        assert_eq!(record.u12, 178);
+        assert_eq!(record.element, Some("N".to_string()));
+        const LINE2: &str =
+            "ANISOU    1  N   MET A   1      688   1234    806    -19    -49    178          ";
+        let record = AnisotropicRecord::from(LINE2);
+        assert_eq!(record.serial, 1);
+        assert_eq!(record.name, "N");
+        assert_eq!(record.res_name, "MET");
+        assert_eq!(record.chain_id, 'A');
+        assert_eq!(record.res_seq, 1);
+        assert_eq!(record.u00, 688);
+        assert_eq!(record.u11, 1234);
+        assert_eq!(record.u22, 806);
+        assert_eq!(record.u01, -19);
+        assert_eq!(record.u02, -49);
+        assert_eq!(record.u12, 178);
+        assert_eq!(record.element, None);
+    }
+
+    #[test]
+    #[cfg(feature = "serde")]
+    fn test_serde_serialization() {
+        let record = AnisotropicRecord {
+            serial: 1,
+            name: "N".to_string(),
+            alt_loc: None,
+            res_name: "MET".to_string(),
+            chain_id: 'A',
+            res_seq: 1,
+            i_code: None,
+            u00: 688,
+            u11: 1234,
+            u22: 806,
+            u01: -19,
+            u02: -49,
+            u12: 178,
+            element: Some("N".to_string()),
+            charge: None,
+        };
+        let serialized = serde_json::to_string(&record).expect("Serialization failed");
+        assert_eq!(
+            serialized,
+            r#"{"serial":1,"name":"N","alt_loc":null,"res_name":"MET","chain_id":"A","res_seq":1,"i_code":null,"u00":688,"u11":1234,"u22":806,"u01":-19,"u02":-49,"u12":178,"element":"N","charge":null}"#
+        );
+        let deserialized: AnisotropicRecord =
+            serde_json::from_str(&serialized).expect("Deserialization failed");
+        assert_eq!(record, deserialized);
+    }
 }
