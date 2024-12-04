@@ -70,4 +70,18 @@ mod tests {
         assert_eq!(record.het_id, "SAD");
         assert_eq!(record.text, "DINUCLEOTIDE");
     }
+
+    #[test]
+    #[cfg(feature = "serde")]
+    fn test_serde_serialization() {
+        let line = "HETNAM     NAG N-ACETYL-D-GLUCOSAMINE";
+        let record = HetnamRecord::from(line);
+        let serialized = serde_json::to_string(&record).unwrap();
+        assert_eq!(
+            serialized,
+            r#"{"continuation":null,"het_id":"NAG","text":"N-ACETYL-D-GLUCOSAMINE"}"#
+        );
+        let deserialized: HetnamRecord = serde_json::from_str(&serialized).unwrap();
+        assert_eq!(record, deserialized);
+    }
 }
