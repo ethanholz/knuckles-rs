@@ -4,6 +4,7 @@ build-backend = "maturin"
 
 [project]
 name = "knuckles_parse"
+dynamic = ["version"]
 requires-python = ">=3.9"
 classifiers = [
     "Programming Language :: Rust",
