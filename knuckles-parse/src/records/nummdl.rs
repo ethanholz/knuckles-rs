@@ -7,15 +7,25 @@ use pyo3::prelude::*;
 #[cfg(feature = "python")]
 use knuckles_macro::pydefault;
 
+/// Represents a NUMMDL record specifying the number of models in a PDB file.
+///
+/// NUMMDL records specify the total number of MODEL/ENDMDL groups in the file.
+/// This is particularly useful for NMR structures and molecular dynamics trajectories.
+///
+/// # Fields
+///
+/// - `count`: Total number of models in the file
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "python", pyclass(get_all, set_all))]
 #[cfg_attr(feature = "python", pydefault)]
 pub struct NummdlRecord {
+    /// Total number of models in the file
     pub count: u32,
 }
 
 impl NummdlRecord {
+    /// Create a new NummdlRecord by parsing a NUMMDL line.
     pub fn new(str: &str) -> NummdlRecord {
         NummdlRecord {
             count: str[10..14].trim().parse::<u32>().unwrap_or_default(),

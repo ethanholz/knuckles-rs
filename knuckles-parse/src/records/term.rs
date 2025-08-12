@@ -7,19 +7,36 @@ use pyo3::prelude::*;
 #[cfg(feature = "python")]
 use knuckles_macro::pydefault;
 
+/// Represents a TER (termination) record indicating the end of a chain.
+///
+/// TER records are used to indicate the end of a list of ATOM/HETATM records for a chain.
+///
+/// # Fields
+///
+/// - `serial`: Serial number of the terminating atom
+/// - `res_name`: Residue name of the terminating residue  
+/// - `chain_id`: Chain identifier
+/// - `res_seq`: Residue sequence number
+/// - `i_code`: Insertion code
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "python", pyclass(get_all, set_all))]
 #[cfg_attr(feature = "python", pydefault)]
 pub struct TermRecord {
+    /// Serial number of the terminating atom
     pub serial: u32,
+    /// Residue name of the terminating residue
     pub res_name: String,
+    /// Chain identifier
     pub chain_id: char,
+    /// Residue sequence number
     pub res_seq: i16,
+    /// Insertion code
     pub i_code: Option<char>,
 }
 
 impl TermRecord {
+    /// Create a new TermRecord by parsing a TER line.
     pub fn new(str: &str) -> TermRecord {
         TermRecord {
             serial: str[6..11].trim().parse().unwrap_or_default(),

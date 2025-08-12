@@ -1,9 +1,70 @@
+//! # knuckles-parse
+//!
+//! A fast and efficient PDB (Protein Data Bank) file parser written in Rust.
+//!
+//! This library provides functionality to parse PDB files into structured Rust data types,
+//! with support for parallel processing, Python bindings, and serialization.
+//!
+//! ## Features
+//!
+//! - **Fast parsing**: Optimized for performance with optional parallel processing
+//! - **Comprehensive record support**: Handles all major PDB record types
+//! - **Python bindings**: Optional Python integration via PyO3
+//! - **Serialization**: Optional JSON serialization support via Serde
+//! - **Parallel processing**: Optional multi-threaded parsing with Rayon
+//!
+//! ## Example
+//!
+//! ```rust
+//! use knuckles_parse::{pdbreader_single, Record};
+//!
+//! let pdb_content = "ATOM      1  N   ALA A   1      20.154  16.967  27.462  1.00 11.18           N";
+//! let records = pdbreader_single(pdb_content);
+//!
+//! match &records[0] {
+//!     Record::Atom(atom) => {
+//!         println!("Atom name: {}", atom.name);
+//!         println!("Coordinates: ({}, {}, {})", atom.x, atom.y, atom.z);
+//!     }
+//!     _ => {}
+//! }
+//! ```
+
 pub mod records;
 use records::Record;
 
 #[cfg(feature = "python")]
 use pyo3::prelude::*;
 
+/// Parse PDB file contents using parallel processing.
+///
+/// This function processes PDB file contents line-by-line using parallel processing
+/// to extract structured record data. It automatically handles atom serial number
+/// assignment for atoms that don't have them, which is necessary for some PDB files
+/// with more than 99,999 atoms.
+///
+/// # Arguments
+///
+/// * `contents` - The complete PDB file contents as a string
+///
+/// # Returns
+///
+/// A vector of [`Record`] variants representing the parsed PDB records.
+///
+/// # Features
+///
+/// This function is only available when the `parallel` feature is enabled.
+///
+/// # Example
+///
+/// ```rust
+/// use knuckles_parse::pdbreader_parallel;
+///
+/// let pdb_content = "ATOM      1  N   ALA A   1      20.154  16.967  27.462  1.00 11.18           N\n\
+///                    ATOM      2  CA  ALA A   1      20.987  18.149  27.890  1.00 11.85           C";
+/// let records = pdbreader_parallel(pdb_content);
+/// println!("Parsed {} records", records.len());
+/// ```
 #[cfg(feature = "parallel")]
 pub fn pdbreader_parallel(contents: &str) -> Vec<Record> {
     use rayon::prelude::*;
@@ -37,6 +98,32 @@ pub fn pdbreader_parallel(contents: &str) -> Vec<Record> {
     record
 }
 
+/// Parse PDB file contents using single-threaded processing.
+///
+/// This function processes PDB file contents line-by-line in a single thread
+/// to extract structured record data. It handles atom serial number assignment
+/// during the parsing process, making it more efficient than the parallel version
+/// for smaller files.
+///
+/// # Arguments
+///
+/// * `contents` - The complete PDB file contents as a string
+///
+/// # Returns
+///
+/// A vector of [`Record`] variants representing the parsed PDB records.
+/// Note: Currently only returns ATOM records, filtering out other record types.
+///
+/// # Example
+///
+/// ```rust
+/// use knuckles_parse::pdbreader_single;
+///
+/// let pdb_content = "ATOM      1  N   ALA A   1      20.154  16.967  27.462  1.00 11.18           N\n\
+///                    HETATM    2  O   HOH A   2      15.123  12.456  30.789  1.00 25.50           O";
+/// let records = pdbreader_single(pdb_content);
+/// println!("Parsed {} atom records", records.len());
+/// ```
 pub fn pdbreader_single(contents: &str) -> Vec<Record> {
     let mut last = 0;
     contents

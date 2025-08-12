@@ -1,18 +1,39 @@
+//! PDB record type definitions and parsers.
+//!
+//! This module contains all the supported PDB record types and their parsing implementations.
+//! Each record type has its own submodule with specific parsing logic and data structures.
+
+/// Anisotropic temperature factor records (ANISOU)
 pub mod anisotropic;
+/// Atom coordinate records (ATOM/HETATM)
 pub mod atom;
+/// Connectivity records (CONECT)
 pub mod connect;
+/// Crystal structure parameters (CRYST1)
 pub mod crystal;
+/// Database reference records (DBREF)
 pub mod dbref;
+/// Hetero-compound records (HET)
 pub mod het;
+/// Hetero-compound name records (HETNAM)
 pub mod hetnam;
+/// Model records (MODEL)
 pub mod model;
+/// Modified residue records (MODRES)
 pub mod modres;
+/// Matrix transformation records (MTRIX1/2/3)
 pub mod mtrixn;
+/// Number of models records (NUMMDL)
 pub mod nummdl;
+/// Original coordinate system transformation records (ORIGX1/2/3)
 pub mod origxn;
+/// Scale matrix records (SCALE1/2/3)
 pub mod scalen;
+/// Sequence differences records (SEQADV)
 pub mod seqadv;
+/// Residue sequence records (SEQRES)
 pub mod seqres;
+/// Chain termination records (TER)
 pub mod term;
 
 #[cfg(feature = "serde")]
@@ -21,27 +42,85 @@ use serde::{Deserialize, Serialize};
 #[cfg(feature = "python")]
 use pyo3::prelude::*;
 
+/// Represents all supported PDB record types.
+///
+/// This enum encompasses all the different types of records that can be found in a PDB file.
+/// Each variant contains the specific data structure for that record type.
+///
+/// # Record Types
+///
+/// - `Anisou` - Anisotropic temperature factor records
+/// - `Atom` - Standard atom coordinate records
+/// - `Connect` - Connectivity records showing bonds between atoms
+/// - `Crystal` - Crystallographic unit cell parameters
+/// - `DBRef` - Database reference records
+/// - `Het` - Hetero-compound records
+/// - `Hetatm` - Hetero-atom coordinate records (uses same structure as `Atom`)
+/// - `Hetnam` - Hetero-compound name records
+/// - `Nummdl` - Number of models in the file
+/// - `MtrixN` - Transformation matrix records (N = 1, 2, or 3)
+/// - `Model` - Model records for multi-model structures
+/// - `Modres` - Modified residue records
+/// - `OrigxN` - Original coordinate system transformation (N = 1, 2, or 3)
+/// - `ScaleN` - Scale matrix records (N = 1, 2, or 3)
+/// - `Seqres` - Residue sequence records
+/// - `Seqadv` - Sequence differences from database
+/// - `Term` - Chain termination records
+/// - `Endmdl` - End of model marker (no associated data)
+///
+/// # Example
+///
+/// ```rust
+/// use knuckles_parse::records::Record;
+///
+/// let line = "ATOM      1  N   ALA A   1      20.154  16.967  27.462  1.00 11.18           N";
+/// let record = Record::try_from(line).unwrap();
+///
+/// match record {
+///     Record::Atom(atom) => println!("Found atom: {}", atom.name),
+///     Record::Hetatm(hetatm) => println!("Found hetatm: {}", hetatm.name),
+///     _ => println!("Other record type"),
+/// }
+/// ```
 #[derive(Debug)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "python", pyclass)]
 pub enum Record {
+    /// Anisotropic temperature factor record
     Anisou(anisotropic::AnisotropicRecord),
+    /// Standard atom coordinate record
     Atom(atom::AtomRecord),
+    /// Connectivity record showing bonds between atoms
     Connect(connect::ConnectRecord),
+    /// Crystallographic unit cell parameters
     Crystal(crystal::CrystalRecord),
+    /// Database reference record
     DBRef(dbref::DBRefRecord),
+    /// Hetero-compound record
     Het(het::HetRecord),
+    /// Hetero-atom coordinate record (same structure as Atom)
     Hetatm(atom::AtomRecord),
+    /// Hetero-compound name record
     Hetnam(hetnam::HetnamRecord),
+    /// Number of models record
     Nummdl(nummdl::NummdlRecord),
+    /// Transformation matrix record (MTRIX1, MTRIX2, or MTRIX3)
     MtrixN(mtrixn::MtrixN),
+    /// Model record for multi-model structures
     Model(model::ModelRecord),
+    /// Modified residue record
     Modres(modres::ModresRecord),
+    /// Original coordinate system transformation (ORIGX1, ORIGX2, or ORIGX3)
     OrigxN(origxn::OrigxN),
+    /// Scale matrix record (SCALE1, SCALE2, or SCALE3)
     ScaleN(scalen::ScaleN),
+    /// Residue sequence record
     Seqres(seqres::SeqresRecord),
+    /// Sequence differences from database
     Seqadv(seqadv::SeqAdvRecord),
+    /// Chain termination record
     Term(term::TermRecord),
+    /// End of model marker
     Endmdl(),
 }
 #[cfg(feature = "python")]
@@ -118,6 +197,35 @@ impl Record {
 impl TryFrom<&str> for Record {
     type Error = &'static str;
 
+    /// Parse a PDB line into the appropriate Record variant.
+    ///
+    /// This method examines the first 6 characters of the line to determine the record type
+    /// and then delegates to the appropriate record-specific parser.
+    ///
+    /// # Arguments
+    ///
+    /// * `line` - A single line from a PDB file
+    ///
+    /// # Returns
+    ///
+    /// - `Ok(Record)` - Successfully parsed record
+    /// - `Err(&'static str)` - Error message if parsing failed
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if:
+    /// - The line is shorter than 6 characters
+    /// - The record type is not recognized
+    /// - The line format is invalid for the detected record type
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use knuckles_parse::records::Record;
+    ///
+    /// let line = "ATOM      1  N   ALA A   1      20.154  16.967  27.462  1.00 11.18           N";
+    /// let record = Record::try_from(line).unwrap();
+    /// ```
     fn try_from(line: &str) -> Result<Self, Self::Error> {
         match &line.get(0..6) {
             Some(item) => match *item {

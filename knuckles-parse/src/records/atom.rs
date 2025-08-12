@@ -7,6 +7,46 @@ use knuckles_macro::pydefault;
 #[cfg(feature = "python")]
 use pyo3::prelude::*;
 
+/// Represents an ATOM or HETATM record from a PDB file.
+///
+/// This structure contains all the information for an atom coordinate record,
+/// including position, occupancy, temperature factors, and identification data.
+///
+/// # PDB Format
+///
+/// ATOM records contain atomic coordinate data for standard amino acid and nucleic acid residues.
+/// HETATM records contain atomic coordinate data for non-standard residues, water molecules,
+/// and other hetero-compounds.
+///
+/// # Fields
+///
+/// - `serial`: Atom serial number (1-99999, or hexadecimal for >99999)
+/// - `name`: Atom name (e.g., "CA", "N", "O")
+/// - `alt_loc`: Alternative location indicator
+/// - `res_name`: Residue name (e.g., "ALA", "GLY", "HOH")
+/// - `chain_id`: Chain identifier
+/// - `res_seq`: Residue sequence number
+/// - `i_code`: Insertion code for residues
+/// - `x`, `y`, `z`: Atomic coordinates in Ångströms
+/// - `occupancy`: Occupancy value (0.0-1.0)
+/// - `temp_factor`: Temperature factor (B-factor)
+/// - `element`: Element symbol
+/// - `charge`: Formal charge
+/// - `entry`: PDB entry identifier
+///
+/// # Example
+///
+/// ```rust
+/// use knuckles_parse::records::atom::AtomRecord;
+///
+/// let line = "ATOM      1  N   ALA A   1      20.154  16.967  27.462  1.00 11.18           N";
+/// let atom = AtomRecord::from(line);
+///
+/// assert_eq!(atom.serial, 1);
+/// assert_eq!(atom.name, "N");
+/// assert_eq!(atom.res_name, "ALA");
+/// assert_eq!(atom.x, 20.154);
+/// ```
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(
@@ -14,26 +54,66 @@ use pyo3::prelude::*;
     pyclass(get_all, set_all, module = "kncukles_parse")
 )]
 #[cfg_attr(feature = "python", pydefault)]
-/// A record for an atom in a PDB file
 pub struct AtomRecord {
+    /// Atom serial number (1-99999, or hexadecimal for larger values)
     pub serial: u32,
+    /// Atom name (e.g., "CA", "N", "O")
     pub name: String,
+    /// Alternative location indicator
     pub alt_loc: Option<char>,
+    /// Residue name (e.g., "ALA", "GLY", "HOH")
     pub res_name: String,
+    /// Chain identifier
     pub chain_id: Option<char>,
+    /// Residue sequence number
     pub res_seq: i16,
+    /// Insertion code for residues
     pub i_code: Option<char>,
+    /// X coordinate in Ångströms
     pub x: f32,
+    /// Y coordinate in Ångströms
     pub y: f32,
+    /// Z coordinate in Ångströms
     pub z: f32,
+    /// Occupancy value (0.0-1.0)
     pub occupancy: f32,
+    /// Temperature factor (B-factor)
     pub temp_factor: f32,
+    /// Element symbol
     pub element: Option<String>,
+    /// Formal charge
     pub charge: Option<String>,
+    /// PDB entry identifier
     pub entry: Option<String>,
 }
 
 impl AtomRecord {
+    /// Create a new AtomRecord by parsing a PDB ATOM or HETATM line.
+    ///
+    /// This method parses fixed-width fields according to the PDB format specification.
+    /// It handles both decimal and hexadecimal serial numbers (for atoms > 99999).
+    ///
+    /// # Arguments
+    ///
+    /// * `str` - A single ATOM or HETATM line from a PDB file
+    ///
+    /// # Returns
+    ///
+    /// A new `AtomRecord` with all fields parsed from the input line.
+    ///
+    /// # Panics
+    ///
+    /// Panics if required numeric fields cannot be parsed (coordinates, occupancy, etc.)
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use knuckles_parse::records::atom::AtomRecord;
+    ///
+    /// let line = "ATOM      1  N   ALA A   1      20.154  16.967  27.462  1.00 11.18           N";
+    /// let atom = AtomRecord::new(line);
+    /// assert_eq!(atom.name, "N");
+    /// ```
     pub fn new(str: &str) -> AtomRecord {
         let mut radix = 10;
         let serial = str[6..11].trim();
