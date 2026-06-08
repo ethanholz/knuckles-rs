@@ -6,3 +6,6 @@ result
 mutants*
 lcov.info
 .intentionally-empty-file.o
+# pixi environments
+.pixi/*
+!.pixi/config.toml
