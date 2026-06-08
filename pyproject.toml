@@ -25,11 +25,6 @@ venvPath =  "."
 venv = ".venv"
 mode = "strict"
 
-# [dependency-groups]
-# dev = [
-#     "ruff>=0.7.3",
-# ]
-
 [tool.pixi.workspace]
 channels = ["conda-forge"]
 platforms = ["osx-arm64", "linux-64"]
@@ -40,6 +35,7 @@ knuckles_parse = { path = ".", editable = true }
 [tool.pixi.environments]
 default = { solve-group = "default" }
 dev = { features = ["dev"], solve-group = "default" }
+ci = { features = ["dev", "ci"], solve-group = "default"}
 
 [tool.pixi.tasks]
 
@@ -51,3 +47,5 @@ ruff = ">=0.15.16,<0.16"
 cargo-llvm-cov = ">=0.8.7,<0.9"
 cargo-nextest = ">=0.9.137,<0.10"
 
+[dependency-groups]
+ci = ["codecov-cli"]
