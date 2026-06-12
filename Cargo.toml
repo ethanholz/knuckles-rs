@@ -8,6 +8,7 @@ description = "A tooklkit for parsing PDB records"
 authors = ["Ethan Holz"]
 license = "MIT"
 readme = "README.md"
+repository = "https://tangled.org/ethanholz.com/knuckles-rs"
 
 
 [workspace.dependencies]
