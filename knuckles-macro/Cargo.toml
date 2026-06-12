@@ -3,7 +3,6 @@ name = "knuckles-macro"
 version.workspace = true
 authors.workspace = true
 license.workspace = true
-license-file.workspace = true
 description = "A procedural macro crate for generating Knuckles."
 edition = "2021"
 

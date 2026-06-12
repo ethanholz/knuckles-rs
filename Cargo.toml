@@ -7,7 +7,6 @@ version = "0.2.2"
 description = "A tooklkit for parsing PDB records"
 authors = ["Ethan Holz"]
 license = "MIT"
-license-file = "LICENSE"
 readme = "README.md"
 
 

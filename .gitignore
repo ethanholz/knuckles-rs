@@ -9,3 +9,4 @@ lcov.info
 # pixi environments
 .pixi/*
 !.pixi/config.toml
+AGENTS.md
