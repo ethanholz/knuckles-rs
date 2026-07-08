@@ -244,6 +244,7 @@ impl TryFrom<&str> for Record {
                 "NUMMDL" => Ok(Record::Nummdl(nummdl::NummdlRecord::from(line))),
                 "ORIGX1" | "ORIGX2" | "ORIGX3" => Ok(Record::OrigxN(origxn::OrigxN::from(line))),
                 "SCALE1" | "SCALE2" | "SCALE3" => Ok(Record::ScaleN(scalen::ScaleN::from(line))),
+                "SEQADV" => Ok(Record::Seqadv(seqadv::SeqAdvRecord::from(line))),
                 "SEQRES" => Ok(Record::Seqres(seqres::SeqresRecord::from(line))),
                 "TER   " => Ok(Record::Term(term::TermRecord::from(line))),
                 _ => Err("Unknown record type"),
@@ -289,3 +290,23 @@ impl std::fmt::Display for Record {
 //         Self::try_from(line).unwrap()
 //     }
 // }
+
+#[cfg(test)]
+mod tests {
+    use super::Record;
+
+    #[test]
+    fn parses_seqadv_record() {
+        let line = "SEQADV 2OKW LEU A   64  NOR  NOR00669  PHE    14 SEE REMARK 999";
+        let record = Record::try_from(line).unwrap();
+
+        match record {
+            Record::Seqadv(seqadv) => {
+                assert_eq!("2OKW", seqadv.id_code);
+                assert_eq!("LEU", seqadv.res_name);
+                assert_eq!("SEE REMARK 999", seqadv.conflict);
+            }
+            _ => panic!("expected SEQADV record"),
+        }
+    }
+}

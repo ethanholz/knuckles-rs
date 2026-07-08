@@ -31,7 +31,7 @@
 //! ```
 
 pub mod records;
-use records::Record;
+pub use records::Record;
 
 #[cfg(feature = "python")]
 use pyo3::prelude::*;
