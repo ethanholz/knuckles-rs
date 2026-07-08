@@ -35,6 +35,8 @@ pub mod seqadv;
 pub mod seqres;
 /// Chain termination records (TER)
 pub mod term;
+// Header records (HEADER)
+pub mod header;
 
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -54,6 +56,7 @@ use pyo3::prelude::*;
 /// - `Connect` - Connectivity records showing bonds between atoms
 /// - `Crystal` - Crystallographic unit cell parameters
 /// - `DBRef` - Database reference records
+/// - `Header` - PDB classification, deposition date, and identifier
 /// - `Het` - Hetero-compound records
 /// - `Hetatm` - Hetero-atom coordinate records (uses same structure as `Atom`)
 /// - `Hetnam` - Hetero-compound name records
@@ -96,6 +99,8 @@ pub enum Record {
     Crystal(crystal::CrystalRecord),
     /// Database reference record
     DBRef(dbref::DBRefRecord),
+    /// Header record
+    Header(header::HeaderRecord),
     /// Hetero-compound record
     Het(het::HetRecord),
     /// Hetero-atom coordinate record (same structure as Atom)
@@ -151,6 +156,7 @@ impl Record {
             Self::Connect(connect) => connect.clone().into_pyobject(py).unwrap().into_any().into(),
             Self::Crystal(crystal) => crystal.clone().into_pyobject(py).unwrap().into_any().into(),
             Self::DBRef(dbref) => dbref.clone().into_pyobject(py).unwrap().into_any().into(),
+            Self::Header(header) => header.clone().into_pyobject(py).unwrap().into_any().into(),
             Self::Endmdl() => py.None(),
             Self::Hetatm(atom) => atom.clone().into_pyobject(py).unwrap().into_any().into(),
             Self::Het(het) => het.clone().into_pyobject(py).unwrap().into_any().into(),
@@ -176,6 +182,7 @@ impl Record {
                 Connect(connect),
                 Crystal(crystal),
                 DBRef(dbref),
+                Header(header),
                 Het(het),
                 Hetatm(atom),
                 Hetnam(hetnam),
@@ -234,6 +241,7 @@ impl TryFrom<&str> for Record {
                 "CONECT" => Ok(Record::Connect(connect::ConnectRecord::from(line))),
                 "CRYST1" => Ok(Record::Crystal(crystal::CrystalRecord::from(line))),
                 "DBREF " => Ok(Record::DBRef(dbref::DBRefRecord::from(line))),
+                "HEADER" => Ok(Record::Header(header::HeaderRecord::from(line))),
                 "ENDMDL" => Ok(Record::Endmdl()),
                 "HETATM" => Ok(Record::Hetatm(atom::AtomRecord::from(line))),
                 "HET   " => Ok(Record::Het(het::HetRecord::from(line))),
@@ -268,6 +276,7 @@ impl std::fmt::Display for Record {
             Record::Connect(connect) => write!(f, "{:?}", connect),
             Record::Crystal(crystal) => write!(f, "{:?}", crystal),
             Record::DBRef(dbref) => write!(f, "{:?}", dbref),
+            Record::Header(header) => write!(f, "{:?}", header),
             Record::Endmdl() => write!(f, "ENDMDL"),
             Record::Hetatm(atom) => write!(f, "{:?}", atom),
             Record::Hetnam(hetnam) => write!(f, "{:?}", hetnam),
@@ -307,6 +316,22 @@ mod tests {
                 assert_eq!("SEE REMARK 999", seqadv.conflict);
             }
             _ => panic!("expected SEQADV record"),
+        }
+    }
+
+    #[test]
+    fn parses_header_record() {
+        let line =
+            "HEADER    PHOTOSYNTHESIS                          28-MAR-07   2UXK              ";
+        let record = Record::try_from(line).unwrap();
+
+        match record {
+            Record::Header(header) => {
+                assert_eq!("PHOTOSYNTHESIS", header.classification);
+                assert_eq!("28-MAR-07", header.depDate);
+                assert_eq!("2UXK", header.idCode);
+            }
+            _ => panic!("expected HEADER record"),
         }
     }
 }
