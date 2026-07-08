@@ -10,3 +10,4 @@ lcov.info
 .pixi/*
 !.pixi/config.toml
 AGENTS.md
+.DS_Store
